@@ -1,13 +1,13 @@
 import { useEffect, useMemo } from 'react';
-import { useAppDispatch, useAppSelector } from './store';
+import styled from 'styled-components';
+import moment from 'moment'
+import { GridColDef } from '@mui/x-data-grid';
 import { getOperatorsStart } from './store/slices/operator';
 import { getOperatorsAddonStart } from './store/slices/operatorAddon';
-import { GridColDef } from '@mui/x-data-grid';
-import moment from 'moment'
-import { ColumnsType } from './types/types';
+import { ColumnsType, OperatorAddon } from './types/types';
 import Table from './components/Table/Table';
-import styled from 'styled-components';
 import { STATIC_COLUMNS } from './constants';
+import { useAppDispatch, useAppSelector } from './store';
 
 type RowsType = {
   id: string;
@@ -27,17 +27,16 @@ const Wrapper = styled.div`
 const App = () => {
     const dispatch = useAppDispatch();
     const operators = useAppSelector(state => state.operatorsReducer.operators);
-    const operatorsAddon = useAppSelector(state => state.operatorsAddonReducer.operatorsAddon).filter((item, index, self) =>
-      index === self.findIndex((t) => t.fieldName === item.fieldName)
-    );
+    const operatorsAddon = useAppSelector(state => state.operatorsAddonReducer.operatorsAddon)
+    const uniqOperatorsAddon: OperatorAddon[] = useMemo(() => Object.values(operatorsAddon.reduce((acc, item) => ({...acc, [item.fieldName]: item}), {})), [operatorsAddon]);
 
     useEffect(() => {
         dispatch(getOperatorsStart());
         dispatch(getOperatorsAddonStart());
     }, [dispatch]);
 
-    const dynamicColumns = useMemo(() => operatorsAddon.map(item => ({field: item.fieldName, headerName: item.fieldName, width: 260})), [operatorsAddon]);
-    const dynamicRows: ColumnsType = useMemo(() => operatorsAddon.reduce((acc, item) => ({...acc, [item.fieldName]: item.text}), {}), [operatorsAddon]);
+    const dynamicColumns = useMemo(() => uniqOperatorsAddon.map(item => ({field: item.fieldName, headerName: item.fieldName, width: 260})), [uniqOperatorsAddon]);
+    const dynamicRows: ColumnsType = useMemo(() => uniqOperatorsAddon.reduce((acc, item) => ({...acc, [item.fieldName]: item.text}), {}), [uniqOperatorsAddon]);
 
     const columns: GridColDef[] = useMemo(() => [
       ...STATIC_COLUMNS,

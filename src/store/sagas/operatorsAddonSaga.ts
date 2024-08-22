@@ -1,7 +1,7 @@
 import { put, call } from 'redux-saga/effects';
+import { type SagaIterator } from 'redux-saga';
 import { getOperatorsAddon } from '../../api/getOperatorsAddon';
 import { getOperatorsAddonSuccess } from '../slices/operatorAddon';
-import { type SagaIterator } from 'redux-saga';
 
 export function* workGetOperatorsAddonFetch(): SagaIterator {
     const response = yield call(getOperatorsAddon);
